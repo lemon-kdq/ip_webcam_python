@@ -47,13 +47,13 @@ class IPWebcam:
         sta_url = self.base_url + 'status.json?show_avail=1'
         res = requests.get(sta_url)
         self.avail_status_data = res.json()['avail']
-        # print(self.avail_status_data)
+        print(self.avail_status_data)
 
     def getSensorData(self):
         sen_url = self.base_url + 'sensors.json'
         res = requests.get(sen_url)
         self.curr_status_data = res.json()
-        # print(self.curr_status_data)
+        print(self.curr_status_data)
 
     def getOrientation(self):
         self.getSensorData()
@@ -108,6 +108,28 @@ class IPWebcam:
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         brithness_val = hsv[..., 2].mean()
         # print(brithness_val)
+
+    def showImage(self):
+        photo_url = self.base_url + 'video'
+        vcap = cv2.VideoCapture(photo_url)
+        if not vcap.isOpened():
+            warnings.warn("Couldn't resolve connection request",
+                          RuntimeWarning)
+            return 
+        while True:
+            ret, frame = vcap.read()
+            if not ret:
+                warnings.warn("Couldn't read frame from camera",
+                              RuntimeWarning)
+                break
+            cv2.imshow('IP Webcam', frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+        vcap.release()
+        cv2.destroyAllWindows() 
+            # raise RuntimeError("Couldn't resolve request")
+            
+
 
     def focus(self, state: State):
         if state == State.ON:
@@ -196,6 +218,7 @@ class IPWebcam:
 if __name__ == "__main__":
     # help(IPWebcam)
 
-    ip = '192.168.0.104'
+    ip = '192.168.0.103'
     port = '8080'
     cam = IPWebcam(ip, port)
+    cam.showImage()
