@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image
 import time
 import warnings
+import argparse
 
 from datetime import datetime
 
@@ -224,9 +225,14 @@ class IPWebcam:
 
 if __name__ == "__main__":
     # help(IPWebcam)
-
-    ip = '192.168.0.103'
-    port = '8080'
+    parser = argparse.ArgumentParser(description='IP Webcam Control')
+    parser.add_argument('--ip', type=str, default='192.168.0.103',
+                        help='IP address of the IP Webcam')
+    parser.add_argument('--port', type=str, default='8080',
+                        help='Port of the IP Webcam')
+    args = parser.parse_args() 
+    ip = args.ip
+    port = args.port 
     cam = IPWebcam(ip, port)
     cam.getSensorData()
     # cam.getAvailStatusVals()
