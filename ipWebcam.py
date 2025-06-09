@@ -8,6 +8,7 @@ from PIL import Image
 import time
 import warnings
 
+from datetime import datetime
 
 class Orientation(enum.Enum):
     Landscape = 'landscape'
@@ -41,7 +42,7 @@ class IPWebcam:
         sta_url = self.base_url + 'status.json'
         res = requests.get(sta_url)
         self.curr_status_data = res.json()['curvals']
-        # print(self.curr_status_data)
+        print(self.curr_status_data)
 
     def getAvailStatusVals(self):
         sta_url = self.base_url + 'status.json?show_avail=1'
@@ -118,10 +119,16 @@ class IPWebcam:
             return 
         while True:
             ret, frame = vcap.read()
+            now = datetime.now()
+            time_str = now.strftime("%H:%M:%S.%f")[:-3]  # 保留3位毫秒
             if not ret:
                 warnings.warn("Couldn't read frame from camera",
                               RuntimeWarning)
-                break
+                break 
+            cv2.putText(frame, time_str, 
+                (50, 120), 
+                cv2.FONT_HERSHEY_SIMPLEX, 
+                2, (0, 255, 0), 3)
             cv2.imshow('IP Webcam', frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -221,4 +228,7 @@ if __name__ == "__main__":
     ip = '192.168.0.103'
     port = '8080'
     cam = IPWebcam(ip, port)
+    cam.getSensorData()
+    # cam.getAvailStatusVals()
+    # cam.getCurrentStatusVal()
     cam.showImage()
