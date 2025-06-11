@@ -239,13 +239,13 @@ if __name__ == "__main__":
 
     # 创建线程
     t1 = threading.Thread(target=cam.getSensorData)
-   # t2 = threading.Thread(target=cam.showImage)
+    t2 = threading.Thread(target=cam.showImage)
 
     t1.daemon = True  # 主线程退出时自动结束
-   # t2.daemon = True
+    t2.daemon = True
 
     t1.start()
-    #t2.start()
+    t2.start()
     t1.join()  # 等待传感器数据获取完成
-   # t2.join()  # 等待图像窗口关闭
+    t2.join()  # 等待图像窗口关闭
      
