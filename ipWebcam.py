@@ -8,7 +8,7 @@ from PIL import Image
 import time
 import warnings
 import argparse
-
+import threading
 from datetime import datetime
 
 class Orientation(enum.Enum):
@@ -49,13 +49,14 @@ class IPWebcam:
         sta_url = self.base_url + 'status.json?show_avail=1'
         res = requests.get(sta_url)
         self.avail_status_data = res.json()['avail']
-        print(self.avail_status_data)
+        print(self.avail_status_data,"/n/n")
 
     def getSensorData(self):
         sen_url = self.base_url + 'sensors.json'
-        res = requests.get(sen_url)
-        self.curr_status_data = res.json()
-        print(self.curr_status_data)
+        while True:
+            res = requests.get(sen_url)
+            self.curr_status_data = res.json()
+            print(self.curr_status_data,"\n\n")
 
     def getOrientation(self):
         self.getSensorData()
@@ -234,7 +235,17 @@ if __name__ == "__main__":
     ip = args.ip
     port = args.port 
     cam = IPWebcam(ip, port)
-    cam.getSensorData()
-    # cam.getAvailStatusVals()
-    # cam.getCurrentStatusVal()
-    cam.showImage()
+
+
+    # 创建线程
+    t1 = threading.Thread(target=cam.getSensorData)
+   # t2 = threading.Thread(target=cam.showImage)
+
+    t1.daemon = True  # 主线程退出时自动结束
+   # t2.daemon = True
+
+    t1.start()
+    #t2.start()
+    t1.join()  # 等待传感器数据获取完成
+   # t2.join()  # 等待图像窗口关闭
+     
